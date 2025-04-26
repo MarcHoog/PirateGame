@@ -17,6 +17,7 @@ const (
 
 type Game struct {
 	editor       *Editor
+	editorMenu   *EditorMenu
 	assetManager *AssetManager
 	cursorAsset  *Asset
 }
@@ -32,8 +33,14 @@ func NewGame() *Game {
 		log.Fatal(fmt.Errorf("error getting cursor image: %v", err))
 	}
 
+	editor, editorMenu, err := NewEditor(am)
+	if err != nil {
+		log.Fatal(fmt.Errorf("error creating editor: %v", err))
+	}
+
 	g := &Game{
-		editor:       NewEditor(),
+		editor:       editor,
+		editorMenu:   editorMenu,
 		assetManager: am,
 		cursorAsset:  cursor,
 	}
@@ -42,16 +49,20 @@ func NewGame() *Game {
 
 func (g *Game) Update() (err error) {
 	err = g.editor.Update()
+	err = g.editorMenu.Update()
+
 	if err != nil {
-		return
+		return err
 	}
 	return
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.White)
-	g.DrawCursor(screen)
 	g.editor.Draw(screen)
+	g.editorMenu.Draw(screen)
+
+	g.DrawCursor(screen)
 
 }
 

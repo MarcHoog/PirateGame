@@ -4,6 +4,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"image/color"
+	"time"
 )
 
 type Editor struct {
@@ -11,15 +12,38 @@ type Editor struct {
 	panActive         bool
 	panOffset         Vector2
 	supportLineScreen *ebiten.Image
+
+	assetManager *AssetManager
+	editorData   map[int]EditorAsset
+	state        *EditorState
 }
 
-func NewEditor() *Editor {
-	return &Editor{
+func NewEditor(assetManager *AssetManager) (*Editor, *EditorMenu, error) {
+
+	editorData, err := NewEditorData("./data/editor_data.json")
+	if err != nil {
+		return nil, nil, err
+	}
+
+	editorState := &EditorState{selectionIndex: 2, editorData: editorData}
+
+	editorLevel := &Editor{
 		origin:            Vector2{0, 0},
 		panActive:         false,
 		panOffset:         Vector2{0, 0},
 		supportLineScreen: ebiten.NewImage(screenWidth, screenHeight),
+		assetManager:      assetManager,
+		state:             editorState,
 	}
+
+	editorMenu := &EditorMenu{
+		state:               editorState,
+		assetManager:        assetManager,
+		selectionIndexTimer: time.After(0),
+	}
+	editorMenu.Init()
+
+	return editorLevel, editorMenu, nil
 }
 
 func (l *Editor) Update() (err error) {
@@ -29,8 +53,6 @@ func (l *Editor) Update() (err error) {
 }
 
 func (l *Editor) UpdatePanInput() {
-
-	// Middle mouse stuff
 	middleMousePressed := ebiten.IsMouseButtonPressed(ebiten.MouseButtonMiddle)
 	if middleMousePressed && !l.panActive {
 		l.panActive = true
@@ -40,7 +62,7 @@ func (l *Editor) UpdatePanInput() {
 		l.panActive = false
 	}
 
-	// Left to right panning with MOuse wheel
+	// Left to right panning with Mouse wheel
 	middleMouseWheel := GetMouseWheel()
 	if !middleMouseWheel.IsZero() {
 		if ebiten.IsKeyPressed(ebiten.KeyControlLeft) {
@@ -48,7 +70,6 @@ func (l *Editor) UpdatePanInput() {
 		} else {
 			l.origin.X += middleMouseWheel.Y * 25
 		}
-
 	}
 
 	if l.panActive {

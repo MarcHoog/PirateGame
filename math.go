@@ -39,3 +39,7 @@ func (v Vector2) Sub(v2 Vector2) Vector2 {
 		Y: v.Y - v2.Y,
 	}
 }
+
+func (v Vector2) asFloat64() (float64, float64) {
+	return float64(v.X), float64(v.Y)
+}
