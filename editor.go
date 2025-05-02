@@ -7,6 +7,47 @@ import (
 	"time"
 )
 
+type Scene struct {
+
+	Level
+	Menu
+
+}
+
+func (e *EditorScene) Init() {
+
+}
+
+func (e *EditorScene) InitObservers() {
+
+}
+
+func (e *EditorScene) Update() (err error) {
+	return
+}
+
+func (e *EditorScene) Draw(screen *ebiten.Image) {
+
+}
+
+
+func NewEditorCanvas(assetManager *AssetManager, dataMap *map[int]DataEntry, selectionIndex *int) *EditorScene {
+
+	level := &Editor{
+		origin:            Vector2{0, 0},
+		panActive:         false,
+		panOffset:         Vector2{0, 0},
+		supportLineScreen: ebiten.NewImage(screenWidth, screenHeight),
+		assetManager:      assetManager,
+	}
+
+
+	menu :=
+
+
+	return editorLevel, editorMenu, nil
+}
+
 type Editor struct {
 	origin            Vector2
 	panActive         bool
@@ -14,36 +55,10 @@ type Editor struct {
 	supportLineScreen *ebiten.Image
 
 	assetManager *AssetManager
-	editorData   map[int]EditorAsset
-	state        *EditorState
-}
+	editorData   map[int]DataEntry
 
-func NewEditor(assetManager *AssetManager) (*Editor, *EditorMenu, error) {
-
-	editorData, err := NewEditorData("./data/editor_data.json")
-	if err != nil {
-		return nil, nil, err
-	}
-
-	editorState := &EditorState{selectionIndex: 2, editorData: editorData}
-
-	editorLevel := &Editor{
-		origin:            Vector2{0, 0},
-		panActive:         false,
-		panOffset:         Vector2{0, 0},
-		supportLineScreen: ebiten.NewImage(screenWidth, screenHeight),
-		assetManager:      assetManager,
-		state:             editorState,
-	}
-
-	editorMenu := &EditorMenu{
-		state:               editorState,
-		assetManager:        assetManager,
-		selectionIndexTimer: time.After(0),
-	}
-	editorMenu.Init()
-
-	return editorLevel, editorMenu, nil
+	// This is a shared value
+	selectionIndex *int
 }
 
 func (l *Editor) Update() (err error) {

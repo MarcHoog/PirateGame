@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-type EditorAsset struct {
+type DataEntry struct {
 	Style    string  `json:"style"`
 	Type     string  `json:"type"`
 	Menu     *string `json:"menu"`      // null → nil
@@ -16,7 +16,7 @@ type EditorAsset struct {
 	Graphics *string `json:"graphics"`  // null → nil
 }
 
-func NewEditorData(osPath string) (map[int]EditorAsset, error) {
+func NewDataMap(osPath string) (*map[int]DataEntry, error) {
 	f, err := os.Open(osPath)
 	if err != nil {
 		return nil, err
@@ -24,13 +24,13 @@ func NewEditorData(osPath string) (map[int]EditorAsset, error) {
 
 	defer f.Close()
 
-	raw := make(map[string]EditorAsset)
+	raw := make(map[string]DataEntry)
 	err = json.NewDecoder(f).Decode(&raw)
 	if err != nil {
 		return nil, err
 	}
 
-	data := make(map[int]EditorAsset)
+	data := make(map[int]DataEntry)
 	for k, v := range raw {
 
 		i, err := strconv.Atoi(k)
@@ -41,5 +41,5 @@ func NewEditorData(osPath string) (map[int]EditorAsset, error) {
 
 	}
 
-	return data, nil
+	return &data, nil
 }

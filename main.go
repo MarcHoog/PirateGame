@@ -16,9 +16,8 @@ const (
 )
 
 type Game struct {
-	editor       *Editor
-	editorMenu   *EditorMenu
 	assetManager *AssetManager
+	dataMap      *map[int]DataEntry
 	cursorAsset  *Asset
 }
 
@@ -33,14 +32,13 @@ func NewGame() *Game {
 		log.Fatal(fmt.Errorf("error getting cursor image: %v", err))
 	}
 
-	editor, editorMenu, err := NewEditor(am)
+	dm, err := NewDataMap("./data/data_map.json")
 	if err != nil {
-		log.Fatal(fmt.Errorf("error creating editor: %v", err))
+		log.Fatal(fmt.Errorf("error loading data map: %v", err))
 	}
 
 	g := &Game{
-		editor:       editor,
-		editorMenu:   editorMenu,
+		dataMap:      dm,
 		assetManager: am,
 		cursorAsset:  cursor,
 	}
@@ -48,20 +46,13 @@ func NewGame() *Game {
 }
 
 func (g *Game) Update() (err error) {
-	err = g.editor.Update()
-	err = g.editorMenu.Update()
-
-	if err != nil {
-		return err
-	}
 	return
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.White)
-	g.editor.Draw(screen)
-	g.editorMenu.Draw(screen)
 
+	// Cursor deserves to be at the bottom cause it's the bestest boy
 	g.DrawCursor(screen)
 
 }
