@@ -40,6 +40,10 @@ func (v Vector2) Sub(v2 Vector2) Vector2 {
 	}
 }
 
-func (v Vector2) asFloat64() (float64, float64) {
+func (v Vector2) AsFloat64() (float64, float64) {
 	return float64(v.X), float64(v.Y)
+}
+
+func (v Vector2) AsInt() (int, int) {
+	return int(v.X), int(v.Y)
 }
