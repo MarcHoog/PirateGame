@@ -4,70 +4,24 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"image/color"
-	"time"
 )
 
-type Scene struct {
-
-	Level
-	Menu
-
-}
-
-func (e *EditorScene) Init() {
-
-}
-
-func (e *EditorScene) InitObservers() {
-
-}
-
-func (e *EditorScene) Update() (err error) {
-	return
-}
-
-func (e *EditorScene) Draw(screen *ebiten.Image) {
-
-}
-
-
-func NewEditorCanvas(assetManager *AssetManager, dataMap *map[int]DataEntry, selectionIndex *int) *EditorScene {
-
-	level := &Editor{
-		origin:            Vector2{0, 0},
-		panActive:         false,
-		panOffset:         Vector2{0, 0},
-		supportLineScreen: ebiten.NewImage(screenWidth, screenHeight),
-		assetManager:      assetManager,
-	}
-
-
-	menu :=
-
-
-	return editorLevel, editorMenu, nil
-}
-
-type Editor struct {
+type EditorLevel struct {
 	origin            Vector2
 	panActive         bool
 	panOffset         Vector2
 	supportLineScreen *ebiten.Image
 
-	assetManager *AssetManager
-	editorData   map[int]DataEntry
-
-	// This is a shared value
 	selectionIndex *int
 }
 
-func (l *Editor) Update() (err error) {
+func (l *EditorLevel) Update() (err error) {
 	l.UpdatePanInput()
 	return
 
 }
 
-func (l *Editor) UpdatePanInput() {
+func (l *EditorLevel) UpdatePanInput() {
 	middleMousePressed := ebiten.IsMouseButtonPressed(ebiten.MouseButtonMiddle)
 	if middleMousePressed && !l.panActive {
 		l.panActive = true
@@ -94,14 +48,14 @@ func (l *Editor) UpdatePanInput() {
 	return
 }
 
-func (l *Editor) Draw(screen *ebiten.Image) {
+func (l *EditorLevel) Draw(screen *ebiten.Image) {
 
 	l.DrawTileLines(screen)
 	vector.DrawFilledCircle(screen, l.origin.X, l.origin.Y, 10, color.RGBA{R: 255, B: 0, G: 0, A: 255}, true)
 
 }
 
-func (l *Editor) DrawTileLines(screen *ebiten.Image) {
+func (l *EditorLevel) DrawTileLines(screen *ebiten.Image) {
 	l.supportLineScreen.Clear()
 
 	cols := float32(screenWidth / tileSize)

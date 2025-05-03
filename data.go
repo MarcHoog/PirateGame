@@ -8,15 +8,16 @@ import (
 )
 
 type DataEntry struct {
-	Style    string  `json:"style"`
-	Type     string  `json:"type"`
-	Menu     *string `json:"menu"`      // null → nil
-	MenuSurf *string `json:"menu_surf"` // null → nil
-	Preview  *string `json:"preview"`   // null → nil
-	Graphics *string `json:"graphics"`  // null → nil
+	Index    int
+	Style    string `json:"style"`
+	Type     string `json:"type"`
+	Menu     string `json:"menu"`
+	MenuSurf string `json:"menu_surf"`
+	Preview  string `json:"preview"`
+	Graphics string `json:"graphics"`
 }
 
-func NewDataMap(osPath string) (*map[int]DataEntry, error) {
+func NewData(osPath string) ([]DataEntry, error) {
 	f, err := os.Open(osPath)
 	if err != nil {
 		return nil, err
@@ -30,16 +31,16 @@ func NewDataMap(osPath string) (*map[int]DataEntry, error) {
 		return nil, err
 	}
 
-	data := make(map[int]DataEntry)
+	data := make([]DataEntry, 0)
 	for k, v := range raw {
 
 		i, err := strconv.Atoi(k)
+
 		if err != nil {
 			return nil, fmt.Errorf("invalid key, key should be convertable to integer: %s", k)
 		}
-		data[i] = v
-
+		v.Index = i
+		data = append(data, v)
 	}
-
-	return &data, nil
+	return data, nil
 }

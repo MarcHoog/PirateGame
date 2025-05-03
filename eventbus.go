@@ -1,8 +1,10 @@
-package eventbus
+package main
 
 import (
 	"fmt"
 )
+
+// Structs
 
 type EventType int
 
@@ -11,31 +13,35 @@ type Event struct {
 	Data map[string]interface{}
 }
 
-type cmdType int
-
-const (
-	cmdNewTopic cmdType = iota
-	cmdSubscribe
-	cmdPublish
-)
+type commandType int
 
 type command struct {
-	typ       cmdType
+	typ       commandType
 	topic     string
 	event     Event
 	replyChan chan interface{} // we use interface{} to multiplex return values
 }
+
+// consts
+
+const (
+	cmdNewTopic commandType = iota
+	cmdSubscribe
+	cmdPublish
+)
+
+// The event bus itself
 
 type EventBus struct {
 	cmdChan chan command
 }
 
 func NewEventBus() *EventBus {
-	b := &EventBus{
+	e := &EventBus{
 		cmdChan: make(chan command),
 	}
-	go b.run()
-	return b
+	go e.run()
+	return e
 }
 
 func (e *EventBus) run() {
@@ -44,17 +50,28 @@ func (e *EventBus) run() {
 
 		switch cmd.typ {
 
-		case cmdSubscribe:
-
 		case cmdNewTopic:
+			if _, ok := topics[cmd.topic]; !ok {
+				topics[cmd.topic] = make([]chan Event, 0)
+				cmd.replyChan <- nil
+			} else {
+				cmd.replyChan <- fmt.Errorf("topic already exists")
+			}
+
+		case cmdSubscribe:
+			if _, ok := topics[cmd.topic]; !ok {
+				cmd.replyChan <- fmt.Errorf("topic does not exist")
+			}
+			ch := make(chan Event, 10)
+			topics[cmd.topic] = append(topics[cmd.topic], ch)
+			cmd.replyChan <- ch
 
 		case cmdPublish:
-			if channels, ok := topics[topic]; ok {
+			if channels, ok := topics[cmd.topic]; ok {
 				for _, ch := range channels {
 					select {
-					case ch <- event:
+					case ch <- cmd.event:
 					default:
-						// Optionally drop or log if channel is full
 					}
 				}
 			}

@@ -2,18 +2,18 @@
   "0": {
     "style": "player",
     "type": "object",
-    "menu": null,
-    "menu_surf": null,
-    "preview": null,
+    "menu": "",
+    "menu_surf": "",
+    "preview": "",
     "graphics": "graphics/player/idle_right"
   },
   "1": {
     "style": "sky",
     "type": "object",
-    "menu": null,
-    "menu_surf": null,
-    "preview": null,
-    "graphics": null
+    "menu": "",
+    "menu_surf": "",
+    "preview": "",
+    "graphics": ""
   },
   "2": {
     "style": "terrain",
@@ -21,7 +21,7 @@
     "menu": "terrain",
     "menu_surf": "graphics/menu/land",
     "preview": "graphics/preview/land",
-    "graphics": null
+    "graphics": ""
   },
   "3": {
     "style": "water",
