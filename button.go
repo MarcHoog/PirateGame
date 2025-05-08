@@ -2,70 +2,60 @@ package main
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"image"
 	"image/color"
 )
 
 type Button struct {
-	*Sprite
+	s             *BasicSprite
 	ImageSurfaces []*ebiten.Image
 
-	indexes    []int
-	altIndexes []int
-	index      int
-	mainActive bool
+	imgIndexes    []int
+	imgAltIndexes []int
+	index         int
+	menuType      string
+	mainActive    bool
 }
 
-func CreateButton(anchor Vector2, offset Vector2, buttonSize int, surfaces []*ebiten.Image, indices []int) Button {
+func CreateButton(anchor image.Point, offset image.Point, buttonSize int, surfaces []*ebiten.Image, indices []int) Button {
 	pos := anchor.Add(offset)
 	img := ebiten.NewImage(buttonSize, buttonSize)
-	spr := &Sprite{
-		Vector: pos,
-		Width:  buttonSize,
-		Height: buttonSize,
-		Image:  img,
-	}
+	spr := NewBasicSprite(img, pos)
 	return Button{
-		Sprite:        spr,
-		ImageSurfaces: surfaces,
-		indexes:       indices,
-		altIndexes:    nil,
+		s:             spr,
 		index:         0,
+		imgIndexes:    indices,
+		imgAltIndexes: nil,
 		mainActive:    true,
+		ImageSurfaces: surfaces,
 	}
 }
 
-// Contains Returns if the mouse is over the Sprite
-// TODO: Should just be it's own function that takes in a ebitSprite
-func (b *Button) Contains() bool {
-	pos := GetMousePos()
-	vx, vy := b.Sprite.Vector.X, b.Sprite.Vector.Y
-	w := float32(b.Sprite.Width)
-	h := float32(b.Sprite.Height)
-
-	return pos.X > vx &&
-		pos.X < vx+w &&
-		pos.Y > vy &&
-		pos.Y < vy+h
+func (b *Button) MoveIndex() {
+	b.index += 1
+	if b.index >= len(b.imgIndexes) {
+		b.index = 0
+	}
 }
 
-func (b *Button) Activate() {
-	b.mainActive = true
+func (b *Button) Click() int {
+	if b.mainActive {
+		return b.imgIndexes[b.index]
+	}
+	return b.imgAltIndexes[b.index]
 }
 
 func (b *Button) Update() {
-	b.Sprite.Image.Fill(color.RGBA{R: 126, G: 124, B: 124, A: 255})
+	b.s.Img.Fill(color.RGBA{R: 10, G: 0, B: 0, A: 190})
 
-	surf := b.ImageSurfaces[b.indexes[0]]
-	surfSize := surf.Bounds().Size()
-	surfW, surfH := float32(surfSize.X), float32(surfSize.Y)
+	var menuIcon *BasicSprite
 
-	// Center point of the button
-	center := Vector2{float32(b.Width) / 2, float32(b.Height) / 2}
+	if b.mainActive {
+		menuIcon = NewBasicSprite(b.ImageSurfaces[b.imgIndexes[b.index]], image.Point{})
+	} else {
+		menuIcon = NewBasicSprite(b.ImageSurfaces[b.imgAltIndexes[b.index]], image.Point{})
 
-	// Top-left point to draw the image centered
-	pos := center.Add(Vector2{-surfW / 2, -surfH / 2})
+	}
+	menuIcon.DrawCentered(b.s.Img)
 
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(pos.AsFloat64())
-	b.Sprite.Image.DrawImage(surf, op)
 }

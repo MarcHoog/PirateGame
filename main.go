@@ -19,6 +19,7 @@ type Game struct {
 	assetManager *AssetManager
 	cursorAsset  *Asset
 	editorScene  *EditorScene
+	eventBus     *EventBus
 }
 
 func NewGame() *Game {
@@ -32,10 +33,14 @@ func NewGame() *Game {
 		log.Fatal(fmt.Errorf("error getting cursor image: %v", err))
 	}
 
+	eventBus := NewEventBus()
+	MouseObserver(eventBus)
+
 	g := &Game{
 		assetManager: am,
 		cursorAsset:  cursor,
-		editorScene:  NewEditorScene(am),
+		editorScene:  NewEditorScene(am, eventBus),
+		eventBus:     eventBus,
 	}
 	return g
 }
