@@ -32,7 +32,8 @@ func NewEditorScene(am *AssetManager, bus *EventBus) *EditorScene {
 		supportLineScreen: ebiten.NewImage(screenWidth, screenHeight),
 		selectionIndex:    &selectionIndex,
 		mouseChannel:      mouseInputLevel,
-		canvas:            make(map[image.Point][]int),
+
+		canvas: NewCanvas(am),
 	}
 
 	mouseInputMenu, err := bus.Subscribe(mouseTopic)
@@ -62,14 +63,14 @@ func NewEditorScene(am *AssetManager, bus *EventBus) *EditorScene {
 }
 
 func (es *EditorScene) Draw(screen *ebiten.Image) {
-	es.menu.Draw(screen)
 	es.level.Draw(screen)
+	es.menu.Draw(screen)
 
 }
 
 func (es *EditorScene) Update() (err error) {
-	err = es.menu.Update()
 	err = es.level.Update()
+	err = es.menu.Update()
 	return
 
 }

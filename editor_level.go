@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"image"
@@ -17,7 +16,8 @@ type EditorLevel struct {
 	selectionIndex    *int
 
 	lastSelectedCell image.Point
-	canvas           map[image.Point][]int
+
+	canvas *Canvas
 }
 
 func (l *EditorLevel) Update() (err error) {
@@ -57,32 +57,30 @@ func (l *EditorLevel) UpdateMouseInput() {
 	select {
 	case val := <-l.mouseChannel:
 		if val.Data["btn"] == ebiten.MouseButtonLeft {
-
 			pos := val.Data["pos"].(image.Point)
-			pos = GetMousePosInGrid(pos.Sub(l.origin))
-			if l.lastSelectedCell != pos {
+			l.canvasAdd(pos)
 
-				if _, ok := l.canvas[pos]; ok {
-
-				} else {
-					l.canvas[pos] = []int{0}
-				}
-
-				fmt.Printf("%v\n", l.canvas)
-			}
-
-			l.lastSelectedCell = pos
 		}
 	default:
 	}
 
 }
 
+func (l *EditorLevel) canvasAdd(pos image.Point) {
+	pos = GetMousePosInGrid(pos.Sub(l.origin))
+	if l.lastSelectedCell != pos {
+		// Maybe not ignore this error but for now who really cares am i right?
+		_ = l.canvas.NewTile(pos, *l.selectionIndex)
+
+	}
+	l.lastSelectedCell = pos
+}
+
 func (l *EditorLevel) Draw(screen *ebiten.Image) {
 
 	l.DrawTileLines(screen)
 	vector.DrawFilledCircle(screen, float32(l.origin.X), float32(l.origin.Y), 10, color.RGBA{R: 255, B: 0, G: 0, A: 255}, true)
-
+	l.canvas.Draw(l.origin, screen)
 }
 
 func (l *EditorLevel) DrawTileLines(screen *ebiten.Image) {

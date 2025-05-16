@@ -74,7 +74,7 @@ func (am *AssetManager) Scan(root string) (err error) {
 
 		if !d.IsDir() {
 			assetPath := strings.ReplaceAll(path[0:len(path)-len(filepath.Ext(path))], "\\", "/")
-			am.assets[assetPath] = &Asset{Image: nil, OsPath: "." + "\\" + path}
+			am.assets[assetPath] = &Asset{Image: nil, OsPath: "." + "/" + path}
 
 		}
 		return nil

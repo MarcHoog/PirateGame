@@ -32,7 +32,6 @@ func NewGame() *Game {
 	if err != nil {
 		log.Fatal(fmt.Errorf("error getting cursor image: %v", err))
 	}
-
 	eventBus := NewEventBus()
 	MouseObserver(eventBus)
 
