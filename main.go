@@ -50,7 +50,7 @@ func (g *Game) Update() (err error) {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(color.White)
+	screen.Fill(color.RGBA{R: 240, G: 240, B: 240, A: 255})
 	g.editorScene.Draw(screen)
 	g.DrawCursor(screen)
 

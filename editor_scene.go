@@ -20,18 +20,12 @@ func NewEditorScene(am *AssetManager, bus *EventBus) *EditorScene {
 		panic(err)
 	}
 
-	mouseInputLevel, err := bus.Subscribe("EditorMouseInput")
-	if err != nil {
-		panic(err)
-	}
-
 	level := &EditorLevel{
 		origin:            image.Point{0, 0},
 		panActive:         false,
 		panOffset:         image.Point{0, 0},
 		supportLineScreen: ebiten.NewImage(screenWidth, screenHeight),
 		selectionIndex:    &selectionIndex,
-		mouseChannel:      mouseInputLevel,
 
 		canvas: NewCanvas(am),
 	}

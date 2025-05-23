@@ -12,7 +12,6 @@ type EditorLevel struct {
 	panActive         bool
 	panOffset         image.Point
 	supportLineScreen *ebiten.Image
-	mouseChannel      chan Event
 	selectionIndex    *int
 
 	lastSelectedCell image.Point
@@ -49,31 +48,18 @@ func (l *EditorLevel) UpdatePanInput() {
 	if l.panActive {
 		l.origin = GetMousePos().Sub(l.panOffset)
 	}
-
 	return
 }
 
 func (l *EditorLevel) UpdateMouseInput() {
-	select {
-	case val := <-l.mouseChannel:
-		if val.Data["btn"] == ebiten.MouseButtonLeft {
-			pos := val.Data["pos"].(image.Point)
-			l.canvasAdd(pos)
-
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		pos := GetMousePos()
+		pos = GetMousePosInGrid(pos.Sub(l.origin))
+		if l.lastSelectedCell != pos {
+			_ = l.canvas.NewTile(pos, *l.selectionIndex)
 		}
-	default:
+		l.lastSelectedCell = pos
 	}
-
-}
-
-func (l *EditorLevel) canvasAdd(pos image.Point) {
-	pos = GetMousePosInGrid(pos.Sub(l.origin))
-	if l.lastSelectedCell != pos {
-		// Maybe not ignore this error but for now who really cares am i right?
-		_ = l.canvas.NewTile(pos, *l.selectionIndex)
-
-	}
-	l.lastSelectedCell = pos
 }
 
 func (l *EditorLevel) Draw(screen *ebiten.Image) {
